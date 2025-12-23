@@ -1,51 +1,20 @@
 import telebot
-import random
-from telebot import types  # для создания кнопок
 
-bot = telebot.TeleBot('8562188337:AAHucn5k49skI4Bub9WI2FlTciAybrkHr4M')  # Token бота берётся из BotFather
-
-
-# Создание кнопки после команды Start
-@bot.message_handler(commands=['start'])
-def welcome(message):
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    random_sender = types.KeyboardButton("Скинь Рандомное число")
-    markup.add(random_sender)
-    bot.send_message(message.chat.id, '<b>Генератор Рандома Активирован</b> (бип-пуп-пиип)', parse_mode='html',
-                     reply_markup=markup)
+# Создаем экземпляр бота
+bot = telebot.TeleBot('8562188337:AAHucn5k49skI4Bub9WI2FlTciAybrkHr4M')
 
 
-# Отслеживание нажатий кнопки
-@bot.message_handler(content_types=['text'])
+# Функция, обрабатывающая команду /start
+@bot.message_handler(commands=["start"])
+def start(m, res=False):
+    bot.send_message(m.chat.id, 'Я на связи. Напиши мне что-нибудь )')
 
 
-def first_number_step(message):
-    if message.text == 'Скинь Рандомное число':
-        msg = bot.send_message(message.chat.id, 'Введите начало диапазона')
-        bot.register_next_step_handler(msg, second_number_step)             # переход на функцию second_number_step
-    else:
-        bot.send_message(message.chat.id, 'Такой команды нет')
+# Получение сообщений от юзера
+@bot.message_handler(content_types=["text"])
+def handle_text(message):
+    bot.send_message(message.chat.id, 'Вы написали: ' + message.text)
 
 
-# Получение первого числа диапазона
-def second_number_step(message):
-    global NUM_first
-    NUM_first = int(message.text)
-    msg = bot.send_message(message.chat.id, 'Введите конец диапазона')
-    bot.register_next_step_handler(msg, result_number_step)                 # переход на функцию result_number_step
-
-
-# Получение второго числа диапазона
-def result_number_step(message):
-    global NUM_second
-    NUM_second = int(message.text)
-    result(message)                                                          # Вызов функции result(message)
-
-
-# Вывод результата (рандом)
-def result(message):
-    bot.send_message(message.chat.id, 'Случайное число:  ' + str(random.randint(NUM_first, NUM_second)))
-
-
-#Run
-bot.polling(none_stop=True)
+# Запускаем бота
+bot.polling(none_stop=True, interval=0)
